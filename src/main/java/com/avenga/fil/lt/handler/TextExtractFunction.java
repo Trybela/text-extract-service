@@ -19,8 +19,8 @@ public class TextExtractFunction implements Function<Map<String, String>, Pages>
     private final TextExtractService textExtractService;
 
     @Override
-    public Pages apply(Map<String, String> stringStringMap) {
+    public Pages apply(Map<String, String> request) {
         log.info(TEXT_EXTRACT_LAMBDA_INVOKED);
-        return textExtractService.processRequest(stringStringMap);
+        return textExtractService.processRequest(request);
     }
 }

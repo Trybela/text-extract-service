@@ -20,24 +20,21 @@ import static com.avenga.fil.lt.constant.GeneralConstant.TEXT_EXTRACT_LAMBDA_SUC
 @Service
 public class TextExtractServiceImpl implements TextExtractService {
 
-    private final ImagePdfExtractingService imagePdfExtractingService;
-
-    private Map<FileType, BiFunction<String, String, Pages>> actionResolver;
+    private final Map<FileType, BiFunction<String, String, Pages>> actionResolver;
 
     public TextExtractServiceImpl(ImagePdfExtractingService imagePdfExtractingService) {
-        this.imagePdfExtractingService = imagePdfExtractingService;
         this.actionResolver = Map.of(
-            FileType.PDF, this.imagePdfExtractingService::extractTextFromPdf,
-            FileType.JPG, this.imagePdfExtractingService::extractTextFormImage,
-            FileType.JPEG, this.imagePdfExtractingService::extractTextFormImage,
-            FileType.PNG, this.imagePdfExtractingService::extractTextFormImage,
-            FileType.BMP, this.imagePdfExtractingService::extractTextFormImage
+            FileType.PDF, imagePdfExtractingService::extractTextFromPdf,
+            FileType.JPG, imagePdfExtractingService::extractTextFormImage,
+            FileType.JPEG, imagePdfExtractingService::extractTextFormImage,
+            FileType.PNG, imagePdfExtractingService::extractTextFormImage,
+            FileType.BMP, imagePdfExtractingService::extractTextFormImage
         );
     }
 
     @Override
     public Pages processRequest(Map<String, String> request) {
-        var pages = actionResolver.get(FileType.valueOf(prepareParameter(request, FILE_TYPE)))
+        var pages = actionResolver.get(FileType.valueOf(prepareParameter(request, FILE_TYPE).toUpperCase()))
                 .apply(prepareParameter(request, BUCKET_NAME), prepareParameter(request, FILE_KEY));
         log.info(TEXT_EXTRACT_LAMBDA_SUCCESS);
         return pages;

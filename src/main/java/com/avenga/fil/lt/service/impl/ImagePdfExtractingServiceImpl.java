@@ -6,6 +6,7 @@ import com.avenga.fil.lt.model.LineContent;
 import com.avenga.fil.lt.model.Pages;
 import com.avenga.fil.lt.service.ImagePdfExtractingService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -23,9 +24,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.avenga.fil.lt.constant.GeneralConstant.LOADING_PDF_ERROR;
-import static com.avenga.fil.lt.constant.GeneralConstant.TEXT_EXTRACT_PDF_ERROR;
+import static com.avenga.fil.lt.constant.GeneralConstant.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService {
@@ -37,12 +38,14 @@ public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService 
 
     @Override
     public Pages extractTextFormImage(String bucketName, String key) {
+        log.info(EXTRACTING_FROM_IMAGE);
         var textResponse = textractClient.detectDocumentText(prepareDocumentRequest(bucketName, key));
         return new Pages(List.of(parseAndPrepareLinesContent(textResponse.blocks())));
     }
 
     @Override
     public Pages extractTextFromPdf(String bucketName, String key) {
+        log.info(EXTRACTING_FROM_PDF);
         var inputDocument = generateInputDocument(bucketName, key);
         var pdfRenderer = new PDFRenderer(inputDocument);
         return new Pages(IntStream.range(0, inputDocument.getNumberOfPages())
@@ -63,7 +66,7 @@ public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService 
         try {
             var image = pdfRenderer.renderImageWithDPI(pageIndex, IMAGE_DPI, ImageType.RGB);
             var byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIOUtil.writeImage(image, FileType.JPEG.getFileType(), byteArrayOutputStream);
+            ImageIOUtil.writeImage(image, FileType.JPEG.toString(), byteArrayOutputStream);
             var textResponse = textractClient.detectDocumentText(prepareDocumentRequest(byteArrayOutputStream));
             return parseAndPrepareLinesContent(textResponse.blocks());
         } catch (IOException e) {

@@ -6,8 +6,11 @@ public final class GeneralConstant {
     public static final String TEXT_EXTRACT_PDF_ERROR = "Error during extracting text from pdf process.";
     public static final String LOADING_PDF_ERROR = "Error during loading pdf process.";
 
+    //Logging
     public static final String TEXT_EXTRACT_LAMBDA_INVOKED = "Text extract lambda invoked.";
     public static final String TEXT_EXTRACT_LAMBDA_SUCCESS = "Lambda successfully extracted text from document";
+    public static final String EXTRACTING_FROM_IMAGE = "Start to extract text from image.";
+    public static final String EXTRACTING_FROM_PDF = "Start to extract text from pdf document.";
 
     private GeneralConstant() {
         throw new UnsupportedOperationException();

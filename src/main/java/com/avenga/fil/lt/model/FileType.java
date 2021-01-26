@@ -7,7 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FileType {
 
-    PDF("PDF"), JPG("JPG"), JPEG("JPEG"), PNG("PNG"), BMP("BMP");
-
-    private String fileType;
+    PDF, JPG, JPEG, PNG, BMP
 }
