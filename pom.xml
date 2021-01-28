@@ -20,6 +20,7 @@
 		<aws-java-core.version>1.2.1</aws-java-core.version>
 		<amazon-awssdk.version>2.15.66</amazon-awssdk.version>
 		<pdf-box.version>2.0.22</pdf-box.version>
+		<apache-poi.version>5.0.0</apache-poi.version>
 	</properties>
 
 	<dependencies>
@@ -61,6 +62,38 @@
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox-tools</artifactId>
 			<version>${pdf-box.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${apache-poi.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.github.virtuald</groupId>
+					<artifactId>curvesapi</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>de.rototor.pdfbox</groupId>
+					<artifactId>graphics2d</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.santuario</groupId>
+					<artifactId>xmlsec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.xmlgraphics</groupId>
+					<artifactId>batik-all</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcpkix-jdk15on</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk15on</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
