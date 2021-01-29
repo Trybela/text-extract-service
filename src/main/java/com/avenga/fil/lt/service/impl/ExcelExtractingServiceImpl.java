@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.avenga.fil.lt.constant.GeneralConstant.XLSX_READING_ERROR;
 import static com.avenga.fil.lt.constant.GeneralConstant.XLS_READING_ERROR;
@@ -54,7 +55,7 @@ public class ExcelExtractingServiceImpl implements ExcelExtractingService {
             r.cellIterator().forEachRemaining(
                     cell -> cellMatrix.get(cell.getRowIndex()).add(formatter.formatCellValue(cell)));
         });
-        return cellMatrix;
+        return cellMatrix.stream().filter(list -> !list.isEmpty()).collect(Collectors.toList());
     }
 
     private InputStream documentStream(String bucketName, String key) {
