@@ -5,6 +5,7 @@ import com.avenga.fil.lt.model.FileType;
 import com.avenga.fil.lt.service.ExcelExtractingService;
 import com.avenga.fil.lt.service.ImagePdfExtractingService;
 import com.avenga.fil.lt.service.TextExtractService;
+import com.avenga.fil.lt.service.TxtExtractingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,8 @@ public class TextExtractServiceImpl implements TextExtractService {
     private final Map<FileType, BiFunction<String, String, Object>> actionResolver;
 
     public TextExtractServiceImpl(ImagePdfExtractingService imagePdfExtractingService,
-                                  ExcelExtractingService excelExtractingService) {
+                                  ExcelExtractingService excelExtractingService,
+                                  TxtExtractingService txtExtractingService) {
         this.actionResolver = Map.of(
             FileType.PDF, imagePdfExtractingService::extractTextFromPdf,
             FileType.JPG, imagePdfExtractingService::extractTextFormImage,
@@ -31,12 +33,14 @@ public class TextExtractServiceImpl implements TextExtractService {
             FileType.PNG, imagePdfExtractingService::extractTextFormImage,
             FileType.BMP, imagePdfExtractingService::extractTextFormImage,
             FileType.XLS, excelExtractingService::extractTextFromXls,
-            FileType.XLSX, excelExtractingService::extractTextFromXlsx
+            FileType.XLSX, excelExtractingService::extractTextFromXlsx,
+            FileType.TXT, txtExtractingService::extractTextFromTxt
         );
     }
 
     @Override
     public Object processRequest(Map<String, String> request) {
+        log.info("request" + request);
         var pages = actionResolver.get(FileType.valueOf(prepareParameter(request, FILE_TYPE).toUpperCase()))
                 .apply(prepareParameter(request, BUCKET_NAME), prepareParameter(request, FILE_KEY));
         log.info(TEXT_EXTRACT_LAMBDA_SUCCESS);

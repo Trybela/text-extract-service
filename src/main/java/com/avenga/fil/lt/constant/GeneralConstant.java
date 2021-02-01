@@ -8,6 +8,7 @@ public final class GeneralConstant {
     public static final String LOADING_PDF_ERROR = "Error during loading pdf process.";
     public static final String XLS_READING_ERROR = "Error during reading xls document - %s";
     public static final String XLSX_READING_ERROR = "Error during reading xlsx document - %s";
+    public static final String TXT_READING_ERROR = "Error during reading txt document - %s";
 
     //Logging
     public static final String TEXT_EXTRACT_LAMBDA_INVOKED = "Text extract lambda invoked.";
