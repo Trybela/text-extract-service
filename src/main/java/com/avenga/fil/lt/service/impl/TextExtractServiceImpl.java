@@ -1,31 +1,39 @@
 package com.avenga.fil.lt.service.impl;
 
-import com.avenga.fil.lt.exception.AbsentRequiredParameter;
 import com.avenga.fil.lt.model.FileType;
-import com.avenga.fil.lt.service.ExcelExtractingService;
-import com.avenga.fil.lt.service.ImagePdfExtractingService;
-import com.avenga.fil.lt.service.TextExtractService;
-import com.avenga.fil.lt.service.TxtExtractingService;
+import com.avenga.fil.lt.model.RequestPayloadData;
+import com.avenga.fil.lt.model.TextTranslateInput;
+import com.avenga.fil.lt.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiFunction;
 
-import static com.avenga.fil.lt.constant.ApiEventConstants.*;
-import static com.avenga.fil.lt.constant.GeneralConstant.ABSENT_REQUIRED_PARAMETER;
 import static com.avenga.fil.lt.constant.GeneralConstant.TEXT_EXTRACT_LAMBDA_SUCCESS;
+import static com.avenga.fil.lt.constant.GeneralConstant.TEXT_TRANSLATION_LAMBDA_INVOKED;
 
 @Slf4j
 @Service
 public class TextExtractServiceImpl implements TextExtractService {
 
+    private final TextTranslateService textTranslateService;
+    private final RequestParserService requestParserService;
+    private final ObjectMapper objectMapper;
+    private final ResponseService responseService;
     private final Map<FileType, BiFunction<String, String, Object>> actionResolver;
 
     public TextExtractServiceImpl(ImagePdfExtractingService imagePdfExtractingService,
                                   ExcelExtractingService excelExtractingService,
-                                  TxtExtractingService txtExtractingService) {
+                                  TxtExtractingService txtExtractingService, TextTranslateService textTranslateService,
+                                  RequestParserService requestParserService, ObjectMapper objectMapper,
+                                  ResponseService responseService) {
+        this.textTranslateService = textTranslateService;
+        this.requestParserService = requestParserService;
+        this.objectMapper = objectMapper;
+        this.responseService = responseService;
         this.actionResolver = Map.of(
             FileType.PDF, imagePdfExtractingService::extractTextFromPdf,
             FileType.JPG, imagePdfExtractingService::extractTextFormImage,
@@ -40,15 +48,29 @@ public class TextExtractServiceImpl implements TextExtractService {
 
     @Override
     public Object processRequest(Map<String, String> request) {
-        log.info("request" + request);
-        var pages = actionResolver.get(FileType.valueOf(prepareParameter(request, FILE_TYPE).toUpperCase()))
-                .apply(prepareParameter(request, BUCKET_NAME), prepareParameter(request, FILE_KEY));
-        log.info(TEXT_EXTRACT_LAMBDA_SUCCESS);
-        return pages;
+        try {
+            log.info("request" + request);
+            var data = requestParserService.parseAndPreparePayload(request);
+            var pages = actionResolver.get(FileType.valueOf(data.getFileType().toUpperCase()))
+                    .apply(data.getBucketName(), data.getFileKey());
+            invokingTranslateTextProcess(pages, data);
+            log.info(TEXT_EXTRACT_LAMBDA_SUCCESS);
+            return pages;
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+            return responseService.createErrorResponse(exception);
+        }
     }
 
-    private String prepareParameter(Map<String, String> request, String name) {
-        return Optional.ofNullable(request.get(name)).orElseThrow(
-                () -> new AbsentRequiredParameter(String.format(ABSENT_REQUIRED_PARAMETER, name)));
+    private void invokingTranslateTextProcess(Object content, RequestPayloadData data) throws JsonProcessingException {
+        textTranslateService.translate(TextTranslateInput.builder()
+                .sourceLanguage(data.getSourceLanguage())
+                .targetLanguage(data.getTargetLanguage())
+                .userId(data.getUserId())
+                .documentName(data.getDocumentName())
+                .fileType(data.getFileType())
+                .text(objectMapper.writeValueAsString(content))
+                .build());
+        log.info(TEXT_TRANSLATION_LAMBDA_INVOKED);
     }
 }
