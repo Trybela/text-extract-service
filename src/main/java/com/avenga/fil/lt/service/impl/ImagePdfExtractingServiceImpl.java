@@ -48,13 +48,16 @@ public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService 
     @Override
     public Pages extractTextFromPdf(RequestPayloadData data) {
         log.info(EXTRACTING_FROM_PDF);
-        var inputDocument = generateInputDocument(data.getBucketName(), data.getFileKey());
-        var pdfRenderer = new PDFRenderer(inputDocument);
-        var pages = new Pages(IntStream.range(0, inputDocument.getNumberOfPages())
-                .mapToObj(pageIndex -> dividePdfDocument(pageIndex, pdfRenderer))
-                .collect(Collectors.toList()));
-        extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getFileKey(), inputDocument.getNumberOfPages()));
-        return pages;
+        try (PDDocument inputDocument = generateInputDocument(data.getBucketName(), data.getFileKey())) {
+            var pdfRenderer = new PDFRenderer(inputDocument);
+            var pages = new Pages(IntStream.range(0, inputDocument.getNumberOfPages())
+                    .mapToObj(pageIndex -> dividePdfDocument(pageIndex, pdfRenderer))
+                    .collect(Collectors.toList()));
+            extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getFileKey(), inputDocument.getNumberOfPages()));
+            return pages;
+        } catch (IOException e) {
+            throw new PdfTextExtractException(TEXT_EXTRACT_PDF_ERROR);
+        }
     }
 
     private PDDocument generateInputDocument(String bucketName, String key) {
