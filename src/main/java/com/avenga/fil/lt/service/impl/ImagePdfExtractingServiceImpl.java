@@ -1,9 +1,8 @@
 package com.avenga.fil.lt.service.impl;
 
 import com.avenga.fil.lt.exception.PdfTextExtractException;
-import com.avenga.fil.lt.model.FileType;
-import com.avenga.fil.lt.model.LineContent;
-import com.avenga.fil.lt.model.Pages;
+import com.avenga.fil.lt.model.*;
+import com.avenga.fil.lt.service.ExtractRepository;
 import com.avenga.fil.lt.service.ImagePdfExtractingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,25 +31,30 @@ import static com.avenga.fil.lt.constant.GeneralConstant.*;
 public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService {
 
     private static final Integer IMAGE_DPI = 300;
+    private static final Integer DEFAULT_PAGE_COUNT = 1;
 
     private final TextractClient textractClient;
     private final S3Client s3Client;
+    private final ExtractRepository extractRepository;
 
     @Override
-    public Pages extractTextFormImage(String bucketName, String key) {
+    public Pages extractTextFormImage(RequestPayloadData data) {
         log.info(EXTRACTING_FROM_IMAGE);
-        var textResponse = textractClient.detectDocumentText(prepareDocumentRequest(bucketName, key));
+        var textResponse = textractClient.detectDocumentText(prepareDocumentRequest(data.getBucketName(), data.getFileKey()));
+        extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getFileKey(), DEFAULT_PAGE_COUNT));
         return new Pages(List.of(parseAndPrepareLinesContent(textResponse.blocks())));
     }
 
     @Override
-    public Pages extractTextFromPdf(String bucketName, String key) {
+    public Pages extractTextFromPdf(RequestPayloadData data) {
         log.info(EXTRACTING_FROM_PDF);
-        var inputDocument = generateInputDocument(bucketName, key);
+        var inputDocument = generateInputDocument(data.getBucketName(), data.getFileKey());
         var pdfRenderer = new PDFRenderer(inputDocument);
-        return new Pages(IntStream.range(0, inputDocument.getNumberOfPages())
+        var pages = new Pages(IntStream.range(0, inputDocument.getNumberOfPages())
                 .mapToObj(pageIndex -> dividePdfDocument(pageIndex, pdfRenderer))
                 .collect(Collectors.toList()));
+        extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getFileKey(), inputDocument.getNumberOfPages()));
+        return pages;
     }
 
     private PDDocument generateInputDocument(String bucketName, String key) {

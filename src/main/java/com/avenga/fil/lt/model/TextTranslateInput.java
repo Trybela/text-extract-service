@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TextTranslateInput {
 
+    private String fileKey;
     private String sourceLanguage;
     private String targetLanguage;
     private String userId;

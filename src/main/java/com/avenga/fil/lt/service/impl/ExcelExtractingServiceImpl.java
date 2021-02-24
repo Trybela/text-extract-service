@@ -2,6 +2,7 @@ package com.avenga.fil.lt.service.impl;
 
 import com.avenga.fil.lt.exception.XlsReadingException;
 import com.avenga.fil.lt.exception.XlsxReadingException;
+import com.avenga.fil.lt.model.RequestPayloadData;
 import com.avenga.fil.lt.service.ExcelExtractingService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -29,9 +30,9 @@ public class ExcelExtractingServiceImpl implements ExcelExtractingService {
     private final S3Client s3Client;
 
     @Override
-    public List<List<String>> extractTextFromXls(String bucketName, String key) {
+    public List<List<String>> extractTextFromXls(RequestPayloadData data) {
         try {
-            var workbook = new HSSFWorkbook(documentStream(bucketName, key));
+            var workbook = new HSSFWorkbook(documentStream(data.getBucketName(), data.getFileKey()));
             return readText(workbook.getSheetAt(0));
         } catch (Exception e) {
             throw new XlsReadingException(String.format(XLS_READING_ERROR, e.getMessage()));
@@ -39,9 +40,9 @@ public class ExcelExtractingServiceImpl implements ExcelExtractingService {
     }
 
     @Override
-    public List<List<String>> extractTextFromXlsx(String bucketName, String key) {
+    public List<List<String>> extractTextFromXlsx(RequestPayloadData data) {
         try {
-            Workbook workbook = new XSSFWorkbook(documentStream(bucketName, key));
+            Workbook workbook = new XSSFWorkbook(documentStream(data.getBucketName(), data.getFileKey()));
             return readText(workbook.getSheetAt(0));
         } catch (IOException e) {
             throw new XlsxReadingException(String.format(XLSX_READING_ERROR, e.getMessage()));
