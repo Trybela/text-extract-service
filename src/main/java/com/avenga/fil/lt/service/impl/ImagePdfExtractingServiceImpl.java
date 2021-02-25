@@ -41,7 +41,7 @@ public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService 
     public Pages extractTextFormImage(RequestPayloadData data) {
         log.info(EXTRACTING_FROM_IMAGE);
         var textResponse = textractClient.detectDocumentText(prepareDocumentRequest(data.getBucketName(), data.getFileKey()));
-        extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getFileKey(), DEFAULT_PAGE_COUNT));
+        extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getUnit(), data.getFileKey(), DEFAULT_PAGE_COUNT));
         return new Pages(List.of(parseAndPrepareLinesContent(textResponse.blocks())));
     }
 
@@ -53,7 +53,7 @@ public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService 
             var pages = new Pages(IntStream.range(0, inputDocument.getNumberOfPages())
                     .mapToObj(pageIndex -> dividePdfDocument(pageIndex, pdfRenderer))
                     .collect(Collectors.toList()));
-            extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getFileKey(), inputDocument.getNumberOfPages()));
+            extractRepository.save(ExtractDataEntity.from(data.getUserId(), data.getUnit(), data.getFileKey(), inputDocument.getNumberOfPages()));
             return pages;
         } catch (IOException e) {
             throw new PdfTextExtractException(TEXT_EXTRACT_PDF_ERROR);
@@ -98,4 +98,3 @@ public class ImagePdfExtractingServiceImpl implements ImagePdfExtractingService 
                         .xAxis(b.geometry().polygon().get(0).x()).build()).collect(Collectors.toList());
     }
 }
-
