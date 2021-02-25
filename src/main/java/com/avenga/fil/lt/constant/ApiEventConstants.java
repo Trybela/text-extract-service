@@ -9,6 +9,7 @@ public final class ApiEventConstants {
     public static final String USER_ID = "userId";
     public static final String DOCUMENT_NAME = "documentName";
     public static final String FILE_TYPE = "fileType";
+    public static final String BUSINESS_UNIT = "unit";
 
     private ApiEventConstants() {
         throw new UnsupportedOperationException();
