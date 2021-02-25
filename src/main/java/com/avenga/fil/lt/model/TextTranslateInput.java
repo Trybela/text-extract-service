@@ -17,5 +17,6 @@ public class TextTranslateInput {
     private String userId;
     private String documentName;
     private String fileType;
+    private String unit;
     private Object text;
 }

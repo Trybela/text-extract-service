@@ -21,15 +21,18 @@ public class ExtractDataEntity {
 
     private String userId;
 
+    private String unit;
+
     private String documentName;
 
     private Integer pageCount;
 
     private LocalDateTime extractDateTime;
 
-    public static ExtractDataEntity from(String userId, String documentName, Integer pageCount){
+    public static ExtractDataEntity from(String userId, String unit, String documentName, Integer pageCount){
         return ExtractDataEntity.builder()
                 .userId(userId)
+                .unit(unit)
                 .documentName(documentName)
                 .pageCount(pageCount)
                 .extractDateTime(LocalDateTime.now())

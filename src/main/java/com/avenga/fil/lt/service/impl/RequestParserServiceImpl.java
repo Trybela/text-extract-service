@@ -24,6 +24,7 @@ public class RequestParserServiceImpl implements RequestParserService {
                 .userId(prepareParameter(request, USER_ID))
                 .documentName(prepareParameter(request, DOCUMENT_NAME))
                 .fileType(prepareParameter(request, FILE_TYPE))
+                .unit(prepareParameter(request, BUSINESS_UNIT))
                 .build();
     }
 
