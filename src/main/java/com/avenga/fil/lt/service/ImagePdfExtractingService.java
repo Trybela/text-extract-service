@@ -1,10 +1,11 @@
 package com.avenga.fil.lt.service;
 
 import com.avenga.fil.lt.model.Pages;
+import com.avenga.fil.lt.model.RequestPayloadData;
 
 public interface ImagePdfExtractingService {
 
-    Pages extractTextFormImage(String bucketName, String key);
+    Pages extractTextFormImage(RequestPayloadData data);
 
-    Pages extractTextFromPdf(String bucketName, String key);
+    Pages extractTextFromPdf(RequestPayloadData data);
 }
