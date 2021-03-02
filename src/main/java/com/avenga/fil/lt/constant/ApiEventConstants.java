@@ -10,6 +10,7 @@ public final class ApiEventConstants {
     public static final String DOCUMENT_NAME = "documentName";
     public static final String FILE_TYPE = "fileType";
     public static final String BUSINESS_UNIT = "unit";
+    public static final String XLS_COLUMNS = "xlsColumns";
 
     private ApiEventConstants() {
         throw new UnsupportedOperationException();

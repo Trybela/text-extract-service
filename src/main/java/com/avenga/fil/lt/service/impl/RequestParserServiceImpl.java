@@ -25,6 +25,7 @@ public class RequestParserServiceImpl implements RequestParserService {
                 .documentName(prepareParameter(request, DOCUMENT_NAME))
                 .fileType(prepareParameter(request, FILE_TYPE))
                 .unit(prepareParameter(request, BUSINESS_UNIT))
+                .xlsColumns(prepareParameter(request, XLS_COLUMNS))
                 .build();
     }
 

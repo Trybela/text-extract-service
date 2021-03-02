@@ -70,6 +70,7 @@ public class TextExtractServiceImpl implements TextExtractService {
                 .documentName(data.getDocumentName())
                 .fileType(data.getFileType())
                 .unit(data.getUnit())
+                .xlsColumns(data.getXlsColumns())
                 .text(objectMapper.writeValueAsString(content))
                 .build());
         log.info(TEXT_TRANSLATION_LAMBDA_INVOKED);

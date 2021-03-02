@@ -17,4 +17,5 @@ public class RequestPayloadData {
     private String documentName;
     private String fileType;
     private String unit;
+    private String xlsColumns;
 }
