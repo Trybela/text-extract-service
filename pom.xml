@@ -21,6 +21,7 @@
 		<amazon-awssdk.version>2.15.66</amazon-awssdk.version>
 		<pdf-box.version>2.0.22</pdf-box.version>
 		<apache-poi.version>5.0.0</apache-poi.version>
+		<aws.secrets.manager>1.0.5</aws.secrets.manager>
 	</properties>
 
 	<dependencies>
@@ -128,6 +129,12 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws.secretsmanager</groupId>
+			<artifactId>aws-secretsmanager-jdbc</artifactId>
+			<version>${aws.secrets.manager}</version>
 		</dependency>
 	</dependencies>
 
