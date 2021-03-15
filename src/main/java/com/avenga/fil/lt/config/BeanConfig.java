@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.textract.TextractClient;
 
 @Configuration
@@ -24,6 +26,16 @@ public class BeanConfig {
     @Bean
     public LambdaClient lambdaClient() {
         return LambdaClient.builder().build();
+    }
+
+    @Bean
+    public SnsClient snsClient() {
+        return SnsClient.builder().build();
+    }
+
+    @Bean
+    public SecretsManagerClient secretsManagerClient() {
+        return SecretsManagerClient.builder().build();
     }
 
     @Bean
