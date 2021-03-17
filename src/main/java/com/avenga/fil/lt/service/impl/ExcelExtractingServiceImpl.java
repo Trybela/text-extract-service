@@ -50,11 +50,13 @@ public class ExcelExtractingServiceImpl implements ExcelExtractingService {
     }
 
     private List<List<String>> readText(Sheet sheet) {
-        List<List<String>> cellMatrix = new ArrayList<>(sheet.getLastRowNum());
+        List<List<String>> cellMatrix = new ArrayList<>();
         var formatter = new DataFormatter();
-        sheet.rowIterator().forEachRemaining(r -> { cellMatrix.add(r.getRowNum(), new ArrayList<>());
+        sheet.rowIterator().forEachRemaining(r -> {
+            var list = new ArrayList<String>();
+            cellMatrix.add(list);
             r.cellIterator().forEachRemaining(
-                    cell -> cellMatrix.get(cell.getRowIndex()).add(formatter.formatCellValue(cell)));
+                    cell -> list.add(formatter.formatCellValue(cell)));
         });
         return cellMatrix.stream().filter(list -> !list.isEmpty()).collect(Collectors.toList());
     }
