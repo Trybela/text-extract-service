@@ -17,6 +17,7 @@ public final class GeneralConstant {
     public static final String EXTRACTING_FROM_IMAGE = "Start to extract text from image.";
     public static final String EXTRACTING_FROM_PDF = "Start to extract text from pdf document.";
     public static final String TEXT_TRANSLATION_LAMBDA_INVOKED = "The text translation process has invoked.";
+    public static final String EXTRACTED_TEXT_SUCCESSFULLY_SAVED = "The extracted text successfully saved to s3.";
 
     //Response
     public static final String ERROR_RESPONSE_FORMAT = "ErrorMessage: %s";

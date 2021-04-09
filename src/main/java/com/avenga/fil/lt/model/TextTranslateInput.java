@@ -19,5 +19,4 @@ public class TextTranslateInput {
     private String fileType;
     private String unit;
     private String xlsColumns;
-    private Object text;
 }

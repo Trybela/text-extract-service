@@ -11,8 +11,8 @@ import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 
 @Service
-@EnableConfigurationProperties
 @RequiredArgsConstructor
+@EnableConfigurationProperties
 public class SecretManagerService {
 
     private final DBProperties dbProperties;

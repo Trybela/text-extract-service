@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @Entity
+@Builder
 @Table(name = "LT_EXTRACT_DATA")
 public class ExtractDataEntity {
 
