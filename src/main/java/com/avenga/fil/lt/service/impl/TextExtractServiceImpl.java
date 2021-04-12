@@ -16,8 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.avenga.fil.lt.constant.GeneralConstant.TEXT_EXTRACT_LAMBDA_SUCCESS;
-import static com.avenga.fil.lt.constant.GeneralConstant.TEXT_TRANSLATION_LAMBDA_INVOKED;
+import static com.avenga.fil.lt.constant.GeneralConstant.*;
 
 @Slf4j
 @Service
@@ -29,12 +28,13 @@ public class TextExtractServiceImpl implements TextExtractService {
     private final ResponseService responseService;
     private final Map<FileType, Function<RequestPayloadData, Object>> actionResolver;
     private final SnsService snsService;
+    private final S3Service s3Service;
 
     public TextExtractServiceImpl(ImagePdfExtractingService imagePdfExtractingService,
                                   ExcelExtractingService excelExtractingService,
                                   TxtExtractingService txtExtractingService, TextTranslateService textTranslateService,
                                   RequestParserService requestParserService, ObjectMapper objectMapper,
-                                  ResponseService responseService, SnsService snsService) {
+                                  ResponseService responseService, SnsService snsService, S3Service s3Service) {
         this.textTranslateService = textTranslateService;
         this.requestParserService = requestParserService;
         this.objectMapper = objectMapper;
@@ -50,6 +50,7 @@ public class TextExtractServiceImpl implements TextExtractService {
                 FileType.TXT, txtExtractingService::extractTextFromTxt
         );
         this.snsService = snsService;
+        this.s3Service = s3Service;
     }
 
     @Override
@@ -59,7 +60,8 @@ public class TextExtractServiceImpl implements TextExtractService {
             data = requestParserService.parseAndPreparePayload(request);
             var pages = actionResolver.get(FileType.valueOf(data.getFileType().toUpperCase()))
                     .apply(data);
-            invokingTranslateTextProcess(pages, data);
+            saveTextToS3(data.getDocumentName(), pages);
+            invokingTranslateTextProcess(data);
             log.info(TEXT_EXTRACT_LAMBDA_SUCCESS);
             return pages;
         } catch (Exception exception) {
@@ -69,7 +71,7 @@ public class TextExtractServiceImpl implements TextExtractService {
         }
     }
 
-    private void invokingTranslateTextProcess(Object content, RequestPayloadData data) throws JsonProcessingException {
+    private void invokingTranslateTextProcess(RequestPayloadData data) {
         textTranslateService.translate(TextTranslateInput.builder()
                 .fileKey(data.getFileKey())
                 .sourceLanguage(data.getSourceLanguage())
@@ -79,9 +81,13 @@ public class TextExtractServiceImpl implements TextExtractService {
                 .fileType(data.getFileType())
                 .unit(data.getUnit())
                 .xlsColumns(data.getXlsColumns())
-                .text(objectMapper.writeValueAsString(content))
                 .build());
         log.info(TEXT_TRANSLATION_LAMBDA_INVOKED);
+    }
+
+    private void saveTextToS3(String fileName, Object content) throws JsonProcessingException {
+        s3Service.save(fileName, objectMapper.writeValueAsString(content));
+        log.info(EXTRACTED_TEXT_SUCCESSFULLY_SAVED);
     }
 
     private String formatEmailMessage(Exception exception, RequestPayloadData data) {

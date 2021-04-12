@@ -5,10 +5,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@ConfigurationProperties(prefix = "db")
 @Getter
 @Setter
+@Configuration
+@ConfigurationProperties(prefix = "db")
 public class DBProperties {
 
     private String dbSecretName;
