@@ -28,4 +28,14 @@ public class S3ServiceImpl implements S3Service {
                 .build();
         s3Client.putObject(objectRequest, RequestBody.fromString(content));
     }
+
+    @Override
+    public void save(String documentName, byte[] content) {
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(contentBucketName)
+                .key(documentName)
+                .contentType("text/plain")
+                .build();
+        s3Client.putObject(objectRequest, RequestBody.fromBytes(content));
+    }
 }

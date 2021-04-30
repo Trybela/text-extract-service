@@ -33,8 +33,9 @@ public class TextExtractServiceImpl implements TextExtractService {
     public TextExtractServiceImpl(ImagePdfExtractingService imagePdfExtractingService,
                                   ExcelExtractingService excelExtractingService,
                                   TxtExtractingService txtExtractingService, TextTranslateService textTranslateService,
-                                  RequestParserService requestParserService, ObjectMapper objectMapper,
-                                  ResponseService responseService, SnsService snsService, S3Service s3Service) {
+                                  WordExtractingService wordExtractingService, RequestParserService requestParserService,
+                                  ObjectMapper objectMapper, ResponseService responseService, SnsService snsService,
+                                  S3Service s3Service) {
         this.textTranslateService = textTranslateService;
         this.requestParserService = requestParserService;
         this.objectMapper = objectMapper;
@@ -47,7 +48,8 @@ public class TextExtractServiceImpl implements TextExtractService {
                 FileType.BMP, imagePdfExtractingService::extractTextFormImage,
                 FileType.XLS, excelExtractingService::extractTextFromXls,
                 FileType.XLSX, excelExtractingService::extractTextFromXlsx,
-                FileType.TXT, txtExtractingService::extractTextFromTxt
+                FileType.TXT, txtExtractingService::extractTextFromTxt,
+                FileType.DOCX, wordExtractingService::extractText
         );
         this.snsService = snsService;
         this.s3Service = s3Service;
@@ -60,7 +62,7 @@ public class TextExtractServiceImpl implements TextExtractService {
             data = requestParserService.parseAndPreparePayload(request);
             var pages = actionResolver.get(FileType.valueOf(data.getFileType().toUpperCase()))
                     .apply(data);
-            saveTextToS3(data.getDocumentName(), pages);
+            saveToS3(data, pages);
             invokingTranslateTextProcess(data);
             log.info(TEXT_EXTRACT_LAMBDA_SUCCESS);
             return pages;
@@ -85,8 +87,22 @@ public class TextExtractServiceImpl implements TextExtractService {
         log.info(TEXT_TRANSLATION_LAMBDA_INVOKED);
     }
 
+    private void saveToS3(RequestPayloadData data, Object content) throws JsonProcessingException {
+        var fileType = FileType.valueOf(data.getFileType().toUpperCase());
+        if (fileType == FileType.DOCX) {
+            saveObjectToS3(data.getDocumentName(), content);
+        } else {
+            saveTextToS3(data.getDocumentName(), content);
+        }
+    }
+
     private void saveTextToS3(String fileName, Object content) throws JsonProcessingException {
         s3Service.save(fileName, objectMapper.writeValueAsString(content));
+        log.info(EXTRACTED_TEXT_SUCCESSFULLY_SAVED);
+    }
+
+    private void saveObjectToS3(String fileName, Object content) {
+        s3Service.save(fileName, (byte[]) content);
         log.info(EXTRACTED_TEXT_SUCCESSFULLY_SAVED);
     }
 
