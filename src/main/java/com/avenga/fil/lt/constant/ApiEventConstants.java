@@ -1,0 +1,18 @@
+package com.avenga.fil.lt.constant;
+
+public final class ApiEventConstants {
+
+    public static final String BUCKET_NAME = "bucketName";
+    public static final String FILE_KEY = "fileKey";
+    public static final String FROM_LANGUAGE = "fromLanguage";
+    public static final String TO_LANGUAGE = "toLanguage";
+    public static final String USER_ID = "userId";
+    public static final String DOCUMENT_NAME = "documentName";
+    public static final String FILE_TYPE = "fileType";
+    public static final String BUSINESS_UNIT = "unit";
+    public static final String XLS_COLUMNS = "xlsColumns";
+
+    private ApiEventConstants() {
+        throw new UnsupportedOperationException();
+    }
+}
